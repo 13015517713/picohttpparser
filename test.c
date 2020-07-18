@@ -27,7 +27,6 @@
  
  
 	王驰鑫开始写代码了
-	王驰鑫创建了一个分支
  */
 #include <assert.h>
 #include <stdio.h>
