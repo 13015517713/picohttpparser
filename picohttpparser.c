@@ -263,8 +263,8 @@ static const char *parse_http_version(const char *buf, const char *buf_end, int 
 static const char *parse_headers(const char *buf, const char *buf_end, struct phr_header *headers, size_t *num_headers,
                                  size_t max_headers, int *ret)
 {
-    for (;; ++*num_headers) {
-        CHECK_EOF();
+    for (;; ++*num_headers) {   
+        CHECK_EOF();   //从buf到buf_end开始提取信息
         if (*buf == '\015') {
             ++buf;
             EXPECT_CHAR('\012');
@@ -323,7 +323,7 @@ static const char *parse_headers(const char *buf, const char *buf_end, struct ph
         size_t value_len;
         if ((buf = get_token_to_eol(buf, buf_end, &value, &value_len, ret)) == NULL) {
             return NULL;
-        }
+        }   
         /* remove trailing SPs and HTABs */
         const char *value_end = value + value_len;
         for (; value_end != value; --value_end) {
@@ -331,7 +331,7 @@ static const char *parse_headers(const char *buf, const char *buf_end, struct ph
             if (!(c == ' ' || c == '\t')) {
                 break;
             }
-        }
+        }   //  字符串模拟，提取出来。 value和大小从http请求中
         headers[*num_headers].value = value;
         headers[*num_headers].value_len = value_end - value;
     }
@@ -480,7 +480,7 @@ int phr_parse_response(const char *buf_start, size_t len, int *minor_version, in
 
     return (int)(buf - buf_start);
 }
-
+//  ����Ľ���߼�       ����ַ���
 int phr_parse_headers(const char *buf_start, size_t len, struct phr_header *headers, size_t *num_headers, size_t last_len)
 {
     const char *buf = buf_start, *buf_end = buf + len;
@@ -501,7 +501,6 @@ int phr_parse_headers(const char *buf_start, size_t len, struct phr_header *head
 
     return (int)(buf - buf_start);
 }
-
 enum {
     CHUNKED_IN_CHUNK_SIZE,
     CHUNKED_IN_CHUNK_EXT,

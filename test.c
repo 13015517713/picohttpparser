@@ -274,16 +274,19 @@ static void test_headers(void)
     struct phr_header headers[4];
     size_t num_headers;
 
+//  待解字符串  大小  表达式
 #define PARSE(s, last_len, exp, comment)                                                                                           \
-    do {                                                                                                                           \
+    do {                                                                                                                            \
         note(comment);                                                                                                             \
-        num_headers = sizeof(headers) / sizeof(headers[0]);                                                                        \
+        num_headers = sizeof(headers) / sizeof(headers[0]);             //  大小是四个？                                                               \
         ok(phr_parse_headers(s, strlen(s), headers, &num_headers, last_len) == (exp == 0 ? strlen(s) : exp));                      \
-    } while (0)
+    } while (0)                                                                                                                       \
 
-    PARSE("Host: example.com\r\nCookie: \r\n\r\n", 0, 0, "simple");
-    ok(num_headers == 2);
-    ok(bufis(headers[0].name, headers[0].name_len, "Host"));
+    
+
+    PARSE("Host: example.com\r\nCookie: \r\n\r\n", 0, 0, "simple");  //    这里解包
+    ok(num_headers == 2);  // ok函数判断是否匹配、是对log的封装   
+    ok(bufis(headers[0].name, headers[0].name_len, "Host"));     //这个字符串中间没有分隔符，所以需要依赖len.
     ok(bufis(headers[0].value, headers[0].value_len, "example.com"));
     ok(bufis(headers[1].name, headers[1].name_len, "Cookie"));
     ok(bufis(headers[1].value, headers[1].value_len, ""));
@@ -446,12 +449,14 @@ int main(int argc, char **argv)
 {
     long pagesize = sysconf(_SC_PAGESIZE);
     assert(pagesize != 1);
-
     inputbuf = mmap(NULL, pagesize * 3, PROT_NONE, MAP_ANON | MAP_PRIVATE, -1, 0);
     assert(inputbuf != MAP_FAILED);
     inputbuf += pagesize * 2;
     ok(mprotect(inputbuf - pagesize, pagesize, PROT_READ | PROT_WRITE) == 0);
+    //  要了三倍空间，在中间那块操作改操作权限  是为什么？ 
 
+
+    //  传不同的函数接口，多抽象了一层。
     subtest("request", test_request);
     subtest("response", test_response);
     subtest("headers", test_headers);
